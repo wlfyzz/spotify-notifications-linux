@@ -1,62 +1,41 @@
-import requests
-import time
-import subprocess
-import os
-import sys
 
-def clear_console():
-    os.system('cls' if os.name == 'nt' else 'clear')
+userid = 1137093225576935485 # your discord user ID
+# Dont touch bellow this line. (or it will break)
+import requests, time, subprocess, os, sys
+required_dir = "/tmp/spotify-notify"
+files_required = ["spotify.png", "spotify-notify.py"]
 
-def send_notification(summary, body, icon_path):
-    subprocess.run([
-        'gdbus', 'call', '--session',
-        '--dest', 'org.freedesktop.Notifications',
-        '--object-path', '/org/freedesktop/Notifications',
-        '--method', 'org.freedesktop.Notifications.Notify',
-        'Spotify', '42', icon_path,
-        summary, body, '[]', '{}', '5000'
-    ])
+if not os.path.exists(required_dir) or any(not os.path.isfile(os.path.join(required_dir, f)) for f in files_required):
+    print("Required files missing. Please check the directory."); sys.exit(0)
+
+if os.name != "posix": print("This script is built for Linux."); sys.exit(0)
+
+def clear_console(): os.system('cls' if os.name == 'nt' else 'clear')
+def send_notification(s, b, i): subprocess.run(['gdbus', 'call', '--session', '--dest', 'org.freedesktop.Notifications',
+                    '--object-path', '/org/freedesktop/Notifications', '--method',
+                    'org.freedesktop.Notifications.Notify', 'Spotify', '42', i, s, b, '[]', '{}', '5000'])
 
 last_song = None
 
 while True:
-    r = requests.get("https://api.lanyard.rest/v1/users/1137093225576935485")
-    data = r.json().get('data', {}).get('spotify', {})
-    
+    data = requests.get(f"https://api.lanyard.rest/v1/users/{userid}").json().get('data', {}).get('spotify', {})
     if 'timestamps' in data:
-        song_title = data.get('song', 'Unknown Title')
-        song_artist = data.get('artist', 'Unknown Artist')
-        
+        title, artist = data.get('song', 'Unknown Title'), data.get('artist', 'Unknown Artist')
         times = data['timestamps']
-        end_time = times['end']
-        ctime = int(time.time()) * 1000
-
-        remaining_time_ms = end_time - ctime
+        remaining_time_ms = times['end'] - int(time.time()) * 1000
         
-        if remaining_time_ms <= 1500 and last_song is not None:
-            last_song = None  # Reset last song when it ends
-            time.sleep(1)
-            continue
+        if remaining_time_ms <= 1500: last_song = None; time.sleep(1); continue
         
-        if remaining_time_ms > 1500 and last_song != f"{song_title} - {song_artist}":
-            notification_message = f"{song_title} By {song_artist}"
-            icon_path = '/tmp/spotify-notify/spotify.png'
-            send_notification('Now Playing', notification_message, icon_path)
-            last_song = f"{song_title} - {song_artist}"
+        if remaining_time_ms > 1500 and last_song != f"{title} - {artist}":
+            send_notification('Now Playing', f"{title} By {artist}", os.path.join(required_dir, 'spotify.png'))
+            last_song = f"{title} - {artist}"
 
         remaining_time_seconds = remaining_time_ms / 1000
-        minutes = int(remaining_time_seconds // 60)
-        seconds = int(remaining_time_seconds % 60)
+        minutes, seconds = divmod(int(remaining_time_seconds), 60)
         total_time_seconds = (times['end'] - times['start']) / 1000
-        progress_seconds = total_time_seconds - remaining_time_seconds
-        progress_percentage = (progress_seconds / total_time_seconds) * 100
+        progress_percentage = (total_time_seconds - remaining_time_seconds) / total_time_seconds * 100
 
         clear_console()
-        print(f"Now Playing: {song_title} - {song_artist}")
-        print(f"Remaining time: {remaining_time_seconds:.2f} seconds")
-        print(f"Remaining time: {minutes} minutes and {seconds} seconds")
-        bar_length = 40
-        filled_length = int(bar_length * progress_percentage // 100)
-        bar = '█' * filled_length + '-' * (bar_length - filled_length)
-        print(f"[{bar}] {progress_percentage:.2f}%")
-
+        print(f"Now Playing: {title} - {artist}\nRemaining time: {remaining_time_seconds:.2f} seconds\nRemaining time: {minutes} minutes and {seconds} seconds")
+        bar_length = 40; filled_length = int(bar_length * progress_percentage // 100)
+        print(f"[{'█' * filled_length}{'-' * (bar_length - filled_length)}] {progress_percentage:.2f}%")
