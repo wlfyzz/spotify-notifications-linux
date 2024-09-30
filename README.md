@@ -1,6 +1,3 @@
-Sure! Here’s a simple Markdown README for your project:
-
-```markdown
 # Spotify Notifier
 
 A simple notification tool for Linux that displays the currently playing song on Spotify and provides console updates.
@@ -54,4 +51,3 @@ Run the notifier script:
 ## License
 
 This project is open-source and available under the MIT License.
-```
