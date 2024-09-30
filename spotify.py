@@ -1,6 +1,3 @@
-userid = 1137093225576935485  # Replace with your Discord user ID
-
-
 #           _  __               
 #          | |/ _|              
 # __      _| | |_ _   _ ________
@@ -10,6 +7,9 @@ userid = 1137093225576935485  # Replace with your Discord user ID
 #                  __/ |        
 #                 |___/         
 # https://x.com/wlfyzz || https://embernodes.com
+
+
+userid = 1137093225576935485
 
 
 # DO NOT TOUCH BELLOW (unless you know what you are doing!)
@@ -54,7 +54,6 @@ def send_notification(s, b, i):
   subprocess.run(['gdbus', 'call', '--session', '--dest', 'org.freedesktop.Notifications',
                   '--object-path', '/org/freedesktop/Notifications', '--method',
                   'org.freedesktop.Notifications.Notify', 'Spotify', '42', i, s, b, '[]', '{}', '5000'])
-
 last_song = None
 print("""
 #           _  __               
@@ -77,18 +76,14 @@ while True:
     title, artist = data.get('song', 'Unknown Title'), data.get('artist', 'Unknown Artist')
     times = data['timestamps']
     remaining_time_ms = times['end'] - int(time.time()) * 1000
-
     if remaining_time_ms <= 1500: last_song = None; time.sleep(1); continue
-
     if remaining_time_ms > 1500 and last_song != f"{title} - {artist}":
       send_notification('Now Playing', f"{title} By {artist}", os.path.join(required_dir, 'spotify.png'))
       last_song = f"{title} - {artist}"
-
     remaining_time_seconds = remaining_time_ms / 1000
     minutes, seconds = divmod(int(remaining_time_seconds), 60)
     total_time_seconds = (times['end'] - times['start']) / 1000
     progress_percentage = (total_time_seconds - remaining_time_seconds) / total_time_seconds * 100
-
     clear_console()
     print(f"Now Playing: {title} - {artist}")
     print(f"Remaining time: {remaining_time_seconds:.2f} seconds")
