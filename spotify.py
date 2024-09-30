@@ -56,15 +56,15 @@ def send_notification(s, b, i):
                   'org.freedesktop.Notifications.Notify', 'Spotify', '42', i, s, b, '[]', '{}', '5000'])
 last_song = None
 print("""
-#           _  __               
-#          | |/ _|              
-# __      _| | |_ _   _ ________
-# \ \ /\ / / |  _| | | |_  /_  /
-#  \ V  V /| | | | |_| |/ / / / 
-#   \_/\_/ |_|_|  \__, /___/___|
-#                  __/ |        
-#                 |___/         
-# https://x.com/wlfyzz || https://embernodes.com
+           _  __               
+          | |/ _|              
+ __      _| | |_ _   _ ________
+ \ \ /\ / / |  _| | | |_  /_  /
+  \ V  V /| | | | |_| |/ / / / 
+   \_/\_/ |_|_|  \__, /___/___|
+                  __/ |        
+                 |___/         
+https://x.com/wlfyzz || https://embernodes.com
 """)
 while True:
   try:
