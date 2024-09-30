@@ -10,7 +10,7 @@
 
 
 userid = 1137093225576935485
-
+    
 
 # DO NOT TOUCH BELLOW (unless you know what you are doing!)
 import requests, time, subprocess, os, sys
@@ -42,20 +42,18 @@ files_required = ["spotify.png", "spotify.py"]
 if not check_and_install(required_dir, files_required):
   sys.exit(1)
 create_launcher(f"{required_dir}/spotify.py")
-
 if os.name != "posix":
   print("This script is built for Linux.")
   sys.exit(0)
-
 def clear_console():
   os.system('cls' if os.name == 'nt' else 'clear')
-
+clear_console()
 def send_notification(s, b, i):
   subprocess.run(['gdbus', 'call', '--session', '--dest', 'org.freedesktop.Notifications',
                   '--object-path', '/org/freedesktop/Notifications', '--method',
                   'org.freedesktop.Notifications.Notify', 'Spotify', '42', i, s, b, '[]', '{}', '5000'])
 last_song = None
-print("""
+print(r"""
            _  __               
           | |/ _|              
  __      _| | |_ _   _ ________
@@ -69,9 +67,12 @@ https://x.com/wlfyzz || https://embernodes.com
 while True:
   try:
     data = requests.get(f"https://api.lanyard.rest/v1/users/{userid}").json().get('data', {}).get('spotify', {})
+    data2 = requests.get(f"https://api.lanyard.rest/v1/users/{userid}").json().get('data', {}).get('discord_user', {})
   except Exception as e:
     print("Error fetching Data from lanyard!")
     sys.exit(1)
+  if not isinstance(data, dict):
+    sys.exit(f"{data2['username']} is not listerning to spotify!")
   if 'timestamps' in data:
     title, artist = data.get('song', 'Unknown Title'), data.get('artist', 'Unknown Artist')
     times = data['timestamps']
@@ -90,3 +91,4 @@ while True:
     print(f"Remaining time: {minutes} minutes and {seconds} seconds")
     bar_length = 40; filled_length = int(bar_length * progress_percentage // 100)
     print(f"[{'█' * filled_length}{'-' * (bar_length - filled_length)}] {progress_percentage:.2f}%")
+
