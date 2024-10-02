@@ -16,7 +16,7 @@ userid = 1137093225576935485
 import requests, time, subprocess, os, sys
 
 
-required_dir =  f"/home/{os.getlogon()}/spotify-notifier", # Directory the code installs itself to
+required_dir =  f"/home/{os.getlogin()}/spotify-notifier", # Directory the code installs itself to
 files_required = ["spotify.png", "spotify.py"] # Required files to run the code
 
 def create_launcher(script_path):
